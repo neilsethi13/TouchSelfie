@@ -52,7 +52,7 @@
 import logging
 log=logging.getLogger(__name__)
 
-from Tkinter import *
+from tkinter import *
 
 class Key:
     """Implements common behavior for a Keyboard Key"""
@@ -515,15 +515,15 @@ class TouchKeyboard:
                     except:
                         pass
                 self.canvas.update()
-            except Exception, e:
+            except Exception as e:
                 log.exception("Error while applying stylesheet")
             
 if __name__ == '__main__':
     r = Tk()
     myres = StringVar()
     def onEnter():
-        print 'Enter Pressed'
-        print "result %s"%myres.get()
+        print('Enter Pressed')
+        print("result %s"%myres.get())
 
     keyboard = TouchKeyboard(r,myres, onEnter = onEnter)
     r.mainloop()

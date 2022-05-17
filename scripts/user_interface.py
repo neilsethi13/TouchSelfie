@@ -12,8 +12,8 @@ logging.basicConfig(format='%(asctime)s|%(name)-16s| %(levelname)-8s| %(message)
             filemode='w',
             level = logging.DEBUG)
 
-from Tkinter import *
-import tkMessageBox
+from tkinter import *
+from tkinter import messagebox #tkMessageBox
 from PIL import ImageTk,Image
 #from tkkb import Tkkb
 from mykb import TouchKeyboard
@@ -40,7 +40,7 @@ try:
     import hardware_buttons as HWB
 except ImportError:
     log.error("Error importing hardware_buttons, using fakehardware instead")
-    print traceback.print_exc()
+    print(traceback.print_exc())
     import fakehardware as HWB
 
 try:
@@ -511,7 +511,7 @@ class UserInterface():
                     #print front
                     snapshot=Image.alpha_composite(snapshot,front)
 
-                except Exception, e:
+                except Exception as e:
                     self.log.error("snap: unable to paste collage cover: %s"%repr(e))
 
 
@@ -653,7 +653,7 @@ class UserInterface():
                 self.status("Snap failed :(")
                 self.log.critical("snap: snapshot file doesn't exists: %s"%snap_filename)
                 self.image.unload()
-        except Exception, e:
+        except Exception as e:
 
             #traceback.print_exc()
             self.log.exception("snap: error during snapshot")
@@ -918,7 +918,7 @@ class UserInterface():
                     config.emailSubject,
                     config.emailMsg,
                     self.last_picture_filename)
-            except Exception, e:
+            except Exception as e:
                 self.log.exception('send_picture: Mail sending Failed')
                 self.status("Send failed :(")
                 retcode = False

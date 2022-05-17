@@ -107,7 +107,7 @@ class OAuthServices:
         if not self.enable_upload: #we don't want it
             return None
         credentials = self.__oauth_login()
-        return build('photoslibrary', 'v1', http=credentials.authorize(Http()), cache_discovery=False)
+        return build('photoslibrary', 'v1', http=credentials.authorize(Http()), cache_discovery=False, static_discovery=False)
         
     def create_album(self, album_name = "New Album", add_placeholder_picture = False):
         """ Create a new album in user's photo library
@@ -295,6 +295,7 @@ class OAuthServices:
         try:
             log.debug("sending message")
             sent_message = (service.users().messages().send(userId="me", body=message).execute())
+            #sent_message = (service.users().messages().send(userId="me", body=message.decode("UTF-8")).execute())
             log.info('send_message: successfully sent message with id: %s' % sent_message['id'])
             return True
         except errors.HttpError as error:
@@ -358,8 +359,11 @@ class OAuthServices:
             filename = os.path.basename(attachment_file)
             msg.add_header('Content-Disposition', 'attachment', filename=filename)
             message.attach(msg)
-
-        return {'raw': base64.urlsafe_b64encode(message.as_string())}
+        #return {'raw': base64.urlsafe_b64encode(message.as_string())}
+        #return {'raw': base64.urlsafe_b64encode(str(message).encode('UTF-8'))}
+        return {'raw': base64.urlsafe_b64encode(message.as_string().encode('UTF-8')).decode('UTF-8')}
+        #return {'raw': message.as_string()}
+        #return {'raw': base64.urlsafe_b64encode(message)} # error message is type MIMEMultipart and needs to be byte like object.
 
 def test():
     """ test email and uploading """
@@ -380,18 +384,18 @@ def test():
     gservice = OAuthServices("client_id.json","storage.json",username,log_level=logging.DEBUG)
 
 
-    print "\nTesting email sending..."
-    print gservice.send_message(username,"oauth2 message sending works!","Here's the Message body",attachment_file="test_image.png")
-    print "\nTesting album list retrieval..."
+    print("\nTesting email sending...")
+    print(gservice.send_message(username,"oauth2 message sending works!","Here's the Message body",attachment_file="test_image.png"))
+    print("\nTesting album list retrieval...")
     albums = gservice.get_user_albums()
     for i, album in enumerate(albums):
-        print "\t title: %s, id: %s"%(album['title'],album['id'])
+        print("\t title: %s, id: %s"%(album['title'],album['id']))
         if i >= 10:
-            print "skipping the remaining albums..."
+            print("skipping the remaining albums...")
             break
-    print "\nTesting album creation and image upload"
+    print("\nTesting album creation and image upload")
     album_id = gservice.create_album(album_name="Test", add_placeholder_picture = True)
-    print "New album id:",album_id
+    print("New album id:",album_id)
     print("Uploading to a bogus album")
     print(gservice.upload_picture("testfile.png",album_id = "BOGUS STRING" , caption="In bogus album", generate_placeholder_picture = True))
     
