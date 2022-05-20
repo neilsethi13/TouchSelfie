@@ -8,6 +8,7 @@
 """
 import os
 import base64
+import requests
 from apiclient import errors, discovery
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -231,9 +232,11 @@ class OAuthServices:
                 with open(filename, "rb") as image_file:
                     filecontent=image_file.read()
             log.debug("upload_picture: uploading picture %s (%d bytes)"%(filename,len(filecontent)))
-            (response,token) = http.request(url,method="POST",body=filecontent,headers=headers)
-            if response.status != 200:
-                log.warning("upload_picture: response code for upload %d != 200"%response.status)
+            # (response,token) = http.request(url,method="POST",body=filecontent,headers=headers)
+            response = requests.post(url, data=filecontent, headers=headers)
+            token = response.text
+            if response.status_code != 200:
+                log.warning("upload_picture: response code for upload %d != 200"%response.status_code)
                 raise IOError("Error connecting to %s"%url)
             log.debug("upload_picture: Successfully uploaded image with id:[%s]"%token)
 
